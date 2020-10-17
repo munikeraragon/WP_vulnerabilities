@@ -34,8 +34,3 @@ volumes:
       device: $PWD/wordpress-data
       o: bind
   db:
-    driver: local
-    driver_opts:
-      type: none
-      device: $PWD/db-data
-      o: bind
