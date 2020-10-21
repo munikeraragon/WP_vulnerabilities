@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+=======
 -- MySQL dump 10.13  Distrib 5.7.32, for Linux (x86_64)
 --
 -- Host: localhost    Database: exampledb
@@ -407,3 +409,4 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2020-10-21 18:23:46
+>>>>>>> b2a5d21446d6c459ff0976800e4626c8073481ed
