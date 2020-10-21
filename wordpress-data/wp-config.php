@@ -87,6 +87,12 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 
 /* That's all, stop editing! Happy blogging. */
 
+
+/* enable media uploads */
+define( 'UPLOADS', 'wp-content/uploads' );
+
+
+
 /** Absolute path to the WordPress directory. */
 if ( !defined('ABSPATH') )
 	define('ABSPATH', dirname(__FILE__) . '/');
