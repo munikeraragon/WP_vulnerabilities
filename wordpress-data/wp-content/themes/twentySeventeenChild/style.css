@@ -5,3 +5,20 @@ Template: twentyseventeen
 Version: 1.0.0 
 Text Domain: twentyseventeen-child 
 */
+
+@media screen and (min-width: 30em) {
+
+	.page-one-column .panel-content .wrap {
+
+		max-width:1000px;
+	}
+}
+
+
+@media screen and (min-width: 48em) {
+
+	.panel-content .wrap {
+		padding-bottom: 3em;
+		padding-top: 3em;
+	}
+}
