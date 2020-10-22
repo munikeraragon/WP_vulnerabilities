@@ -8,8 +8,8 @@ Text Domain: twentyseventeen-child
 
 @media screen and (min-width: 30em) {
 
-	.page-one-column .panel-content .wrap {
-
+	.page-one-column .panel-content .wrap,
+       	.registration_page  {
 		max-width:1000px;
 	}
 }
@@ -21,4 +21,21 @@ Text Domain: twentyseventeen-child
 		padding-bottom: 3em;
 		padding-top: 3em;
 	}
+}
+
+/* registration page */
+
+.registration_page h2 {
+	text-align: center;
+}
+
+
+.registration_page .reg_entry_label {
+
+	margin-bottom: 0;
+}
+
+
+.registration_page input {
+	padding:0.2em;
 }
