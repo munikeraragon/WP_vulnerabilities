@@ -6,6 +6,11 @@ Version: 1.0.0
 Text Domain: twentyseventeen-child 
 */
 
+.picFullWidth {
+	min-width: 100%;
+}
+
+
 @media screen and (min-width: 30em) {
 
 	.page-one-column .panel-content .wrap,
