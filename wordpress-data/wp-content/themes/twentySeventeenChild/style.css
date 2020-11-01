@@ -6,6 +6,20 @@ Version: 1.0.0
 Text Domain: twentyseventeen-child 
 */
 
+.top-menu, .navigation-top .wrap {
+	padding-top:0;
+	padding-bottom: 0;
+
+}
+
+.main-navigation {
+
+	line-height: 1;
+
+}
+
+
+/* set blog pics to full width */
 .picFullWidth {
 	min-width: 100%;
 }
