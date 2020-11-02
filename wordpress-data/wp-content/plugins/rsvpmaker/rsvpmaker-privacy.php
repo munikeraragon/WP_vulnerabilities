@@ -28,8 +28,7 @@ $sql = "SELECT * FROM ".$wpdb->prefix."rsvpmaker WHERE email LIKE '$email_addres
 $results = $wpdb->get_results($sql, ARRAY_A);
 $group_id = 'rsvpmaker';
 $group_label = 'RSVPMaker';
-  if(is_array($results))
-  foreach ($results as $index => $rsvprow ) {
+  foreach ( (array) $results as $index => $rsvprow ) {
 	  if($index > $number)
 		  break;
 	  $data = array();
@@ -39,7 +38,7 @@ $group_label = 'RSVPMaker';
 	  	if(empty($title))
 			$title = 'Event deleted?';
 	  	else
-			$title .= ' ('.date('F j, Y',rsvpmaker_strtotime($date)).')';
+			$title .= ' ('.date('F j, Y',strtotime($date)).')';
 	    $data[] = array('name' => 'event_title', 'value'=> $title);
 			
 	  foreach($profile as $name => $value)
@@ -113,6 +112,6 @@ function rsvpmaker_plugin_add_privacy_policy_content() {
         wp_kses_post( wpautop( $content, false ) )
     );
 }
-
+add_action( 'admin_init', 'rsvpmaker_plugin_add_privacy_policy_content' );
 
 ?>

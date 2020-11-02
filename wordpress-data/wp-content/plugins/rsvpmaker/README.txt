@@ -1,14 +1,13 @@
-=== RSVPMaker ===
+﻿=== RSVPMaker ===
 Contributors: davidfcarr
 Donate: http://www.rsvpmaker.com
-Tags: event, calendar, rsvp, custom post type, paypal, stripe, email, mailchimp, gutenberg
+Tags: event, calendar, rsvp, custom post type, paypal, email, mailchimp, gutenberg
 Donate link: http://rsvpmaker.com/
 License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Requires PHP: 5.6
-Requires at least: 5.0
-Tested up to: 5.5
-Stable tag: 7.8.1
+Requires at least: 3.0
+Tested up to: 4.9.8
+Stable tag: 5.5
 
 Schedule events, send invitations, track RSVPs, and collect PayPal payments.
 
@@ -17,21 +16,18 @@ Schedule events, send invitations, track RSVPs, and collect PayPal payments.
 RSVPMaker is an event scheduling and RSVP tracking plugin for WordPress. Use it to:
 
 * Schedule and promote events of all sorts: conferences, classes, seminars, speaking events, parties and weddings are a few common uses.
+* Promote your event on social media and send out email list invitations using the integration with MailChimp.
 * Register attendees, prompting them to enter whatever information you need, including the names of guests.
-* Collect money using PayPal or Stripe.
-* Promote your event on social media and send out email list invitations using the integration with MailChimp. Can also be used to for email newsletters based on blog posts or event roundups from your website.
+* Collect money using PayPal.
 * Create webinars and other online events leveraging free resources like the YouTube Live service.
-* Use the Limited Time Content Gutenberg block -- a wrapper block that can include paragraphs, images, and other content -- to set a start and/or end time for the display of content. Useful for promoting events and limited time pricing on your home page or in the body of a blog post, without looking foolish if you forget to take down those promotions.
 
-https://youtu.be/gt6fE07a8bc
-
-RSVPMaker is free and open source, with no upsell to a premium version. We occasionally create custom features on contract, but where possible those enhancements are folded back into the core plugin code. RSVPMaker also aims to be developer-friendly, allowing you to build event-centric applications on top of it.
+https://www.youtube.com/watch?v=a85yK-yCBOg
 
 Creating and Managing Events
 
 RSVPMaker events are created and edited just like blog posts in the WordPress editor, with the addition of parameters like event date (so the items can be listed chronologically and displayed on a calendar grid). Supports the Gutenberg editor as well as the classic WordPress editor.
 
-You can use RSVPMaker for event announcements, or turn on the Collect RSVPs function and set additional options for sending email notifications, customizing confirmation and reminder messages, and setting a price or prices if you will be requesting online payments via PayPal.
+Turning on the RSVP function displays additional options for sending email notifications, customizing confirmation and reminder messages, and setting a price or prices if you will be requesting online payments via PayPal.
 
 RSVP reports can be viewed on the administrator's dashboard or downloaded as spreadsheets.
 
@@ -50,9 +46,7 @@ Extensions:
 
 [RSVPMaker Excel](http://wordpress.org/plugins/rsvpmaker-excel) lets you download RSVP reports in Excel for nicer formatting than you get with the CSV output. Uses functions from the [PHPExcel](http://www.phpexcel.net/) library.
 
-Translations (some may be out of date):
-
-German: Markus König, Björn Wilkens
+Translations:
 
 Dutch: Els van der Zalm
 
@@ -62,24 +56,32 @@ Polish: Jarosław Żeliński
 
 Norwegian: Thomas Nybø
 
-Thank you!
+German: Björn Wilkens
 
-POT source file for translators updated May 2020
+Thank you!
 
 == Installation ==
 
 1. Upload the entire `rsvpmaker` folder to the `/wp-content/plugins/` directory.
 1. Activate the plugin through the 'Plugins' menu in WordPress.
 1. Visit the RSVPMaker options page to configure default values for RSVP email notifications, etc.
+1. Ensure you have enabled directory-style permalinks so the address to events is displayed in the format /rsvpmaker/my-event/ rather than ?rsvpmaker=my-event -- see [http://codex.wordpress.org/Using_Permalinks](http://codex.wordpress.org/Using_Permalinks)
 1. Check that you have set the timezone for your site on the Settings -> General WordPress admin screen
-1. Add the Gutenberg block for the RSVPMaker events listing to a page on your site. For the Classic Editor, see the documentation for shortcodes you can use to create an events listing page, or a list of event headlines for the home page. Use the RSVPMaker widget if you would like to add an events listing to your WordPress sidebar.
+1. See the documentation for shortcodes you can use to create an events listing page, or a list of event headlines for the home page. Use the RSVPMaker widget if you would like to add an events listing to your WordPress sidebar.
 1. OPTIONAL: Depending on your theme, you may want to create a single-rsvpmaker.php template to prevent confusion between the post date and the event date (move the post date display code to the bottom or just remove it). A sample for the Twentyten theme is included with this distribution.
-1. OPTIONAL: To enable online payments for events, obtain a PayPal API signature and password.
+1. OPTIONAL: To enable online payments for events, obtain a PayPal API signature and password, edit the included paypal-constants.php file, and upload it (ideally to a location outside of web root). Record the file location on the settings screen.
 1. OPTIONAL: Install [RSVPMaker Excel](http://wordpress.org/extend/plugins/rsvpmaker-excel) if you want the ability to export RSVP reports to a spreadsheet.
+1. OPTIONAL: You can override any of the functions in rsvpmaker-pluggable.php by creating your own rsvpmaker-custom.php file and adding it to the plugins directory (the directory above the rsvpmaker folder). You can, for example, override the function that displays the RSVP form to include more, fewer, or different fields.
 
 For basic usage, you can also have a look at the [plugin homepage](http://www.rsvpmaker.com/).
 
 == Frequently Asked Questions ==
+
+= Why am I getting a "page not found" error? =
+
+A minority of users report that the RSVPMaker permalinks don't function properly in the default configuration. Go to the RSVPMaker options settings screen and check the box for "Tweak Permalinks." This should clear up the problem by making WordPress reset the permalinks.
+
+Also ensure you have enabled directory-style permalinks so the address to events is displayed in the format /rsvpmaker/my-event/ rather than ?rsvpmaker=my-event -- see [http://codex.wordpress.org/Using_Permalinks](http://codex.wordpress.org/Using_Permalinks).
 
 = Where can I get more information about using RSVPMaker? =
 
@@ -87,18 +89,16 @@ For basic usage, you can also have a look at the [plugin homepage](http://www.rs
 
 == Screenshots ==
 
-1. Example of an event listing with an RSVP Now! button (click to display a customizable form with info you want to collect).
-2. Edit events like WordPress posts, setting date, time, and RSVP options.
-3. Event Options screen allows you to set additional parameters, such as event pricing and RSVP deadlines
-4. Event templates let you schedule multiple events that occur on a regular schedule, projecting future dates and adding them as a batch. You can also track events associated with the template. Individual events can still be customized as needed.
-5. Use the RSVPMaker Upcoming block for Gutenberg or the rsvpmaker_upcoming shortcode to add events listing and/or calendar.
-6. Collect event fees using integrations with PayPal and Stripe.
-7. Use the built-in mailer to send invitations and email newsletters, such as roundups of events. Integrates with MailChimp.
+1. Edit events like WordPress posts, setting date, time, and RSVP options.
+2. Example of an event listing with an RSVP Now! button (click to display a customizable form with info you want to collect).
+3. Event templates let you schedule multiple events that occur on a regular schedule, projecting future dates and adding them as a batch. You can also track events associated with the template. Individual events can still be customized as needed.
+4. Popup editor assists with placing the calendar/event listing shortcode on a page.
+5. Use the built-in mailer to send email newsletters, such as roundups of events.
 
 == Credits ==
 
     RSVPMaker
-    Copyright (C) 2010-2020 David F. Carr
+    Copyright (C) 2010 David F. Carr
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -112,537 +112,10 @@ For basic usage, you can also have a look at the [plugin homepage](http://www.rs
 
     See the GNU General Public License at <http://www.gnu.org/licenses/gpl-2.0.html>.
 	
-	RSVPMaker also includes code derived from the software development kits for PayPal, 
-    Stripe and MailChimp under the license of their creators. Inlining of CSS code in
-    the HTML of email messages provided by the [Emogrifier](https://github.com/MyIntervals/emogrifier) library.
+	RSVPMaker also includes code derived from the PayPal NVP API software
+	development kit for PHP.
 
 == Changelog ==
-
-= 7.8.1 =
-
-* Fixed issue with auto-renew from templates formatting dates incorrectly
-* Improved routine for detecting and fixing garbled dates
-
-= 7.8 =
-
-= 7.7.9 =
-
-* Filter events listing by author
-
-= 7.7.8 =
-
-* New import/export function for transferring events between sites.
-* Updated PHPMailer init code in anticipation of WordPress 5.5 change
-
-= 7.7.7 =
-
-* Copy to Email option under New RSVP Email, plus Embed in Email for rsvpmaker events
-
-= 7.7.5 =
-
-* ReCaptcha anti-spam enabled on RSVPMaker Event Submission form (if configured in Settings)
-
-= 7.7.4 =
-
-* Added support for limited rich text editing (bold, italic, and link) with RSVPMaker Event Submission block.
-
-= 7.7.3 =
-
-* RSVPMaker Event Submission block. Adds a form to allow site visitors to submit an event for approval by an editor.
-
-= 7.6.9 =
-
-* Fix for event end times in templates.
-
-= 7.6.8 =
-
-* Tweaks to admin menu options
-* Full screen editing off by default for RSVPMaker and related documents.
-* Option to reset confirmation and reminder messages to default
-
-= 7.6.7 =
-
-* Reminder and follow up messages can be set to go only to those who have paid.
-* Clearer admin bar menu structure for related documents, including confirmations, reminders, and forms, as well as showing those inherited from default and template.
-* Admin bar links are also shown in the Related panel of the RSVPMaker editor sidebar. Links in the Confirmation / Reminder and RSVP Form panels are also more consistent.
-
-= 7.6.6 =
-
-* Fixing a glitch with the auto-renew function for automatically adding event dates based on a template schedule.
-
-= 7.6.5 =
-
-* Refinements for payment confirmation message, RSVPMaker Schedule block for displaying a series of related events.
-
-= 7.6.1 =
-
-* Utility for fixing corrupted dates
-
-= 7.6 =
-
-* Refinements to payment setup screens
-* Created separate payment confirmation message document for details that should only be disclosed after payment, such as the link to a webinar you're charging for.
-
-= 7.5.9 =
-
-* Better detection of duplicate entries
-* Group email uses transactional template
-* Date and time displayed in RSVP form.
-* Future RSVP Links block
-
-= 7.5.8 =
-
-* Tweaks to javascript for changing views on the RSVP Events post listing
-* When other plugins, including my Toastmasters extension, send email, the filter 'rsvpmailer_rule' is called with email address and type of message as arguments. Return 'permit' or 'deny' to determine whether the message will be sent. Supersedes the unsubscribed list. Meant to be a user perference for membership applications.
-
-= 7.5.7 =
-
-* Fix for Future Events / Past Events dropdown on posts listing screen. Previous implementation interfered with standard "Bulk Actions" behavior.
-
-= 7.5.4 =
-
-* Fixed error in event template code
-
-= 7.5.3 =
-
-* Fixed error in Gutenberg code.
-
-= 7.5.2 =
-
-* Bug fixes for copying template metadata, rsvpmaker_is_template function
-
-= 7.5.1 =
-
-* Updating POT source file for translators.
-
-= 7.4.9 =
-
-* Complex template schedules like first and third Monday now display properly in Gutenberg editor.
-
-= 7.4.8 =
-
-* Tweaks to the new event setup screen.
-
-= 7.4.5 =
-
-* Limit debug log (if activated) to current day and previous days (delete older files)
-* Clean up WP Cron jobs on plugin deactivate
-
-= 7.4.3 =
-
-* Better support for attachments and embedded images in email shared through the Group Email feature. Still has an issue with messages that have both embedded images and attachments.
-* Polling mailbox and sending messages now handled via WP Cron actions, interval 1 minute (may take longer) 
-
-= 7.4.2 =
-
-* Limited support for attachments in Group Email discussion lists.
-
-= 7.4 =
-
-* Email distribution lists for member-oriented sites. Any member with a user can send a message from the email address on their profile (or another whietlisted address) for distribution to other list members. See the Group Email tab under settings.
-
-= 7.3.9 =
-
-* Corrects a couple of issues with copying metadata from templates to individual events (when it's not appropriate).
-
-= 7.3.8 =
-
-* Fix for Stripe payment confirmation message
-
-= 7.3.7 =
-
-* Fix to calendar display (timezone issue)
-* Function to lookup Stripe payments by email
-
-= 7.3.4 =
-
-* Fix to make REST API calls to correct site url
-
-= 7.3.3 =
-
-* Better control over specialized blocks like those for use in the form not being shown in the editor outside of that context.
-* Fix to make the RSVP Mailer module distinguish between sending to all users and users who are members of a specific website in a multisite setup.
-
-= 7.3.2 =
-
-* Wrapping shortcodes and dynamic blocks in test that wp_is_json_request returns false. Was seeing unintended output on document save confusing JSON confirmation message.
-
-= 7.2.6 =
-
-* RSVPMaker Schedule block (also rsvpmaker_daily_schedule shortcode) for displaying an hour by hour schedule of events (for example, for a conference)
-
-= 7.2.5 =
-
-* Make sure Stripe submissions include name and email
-
-= 7.2.2 =
-
-* Fix to calendar display
-
-= 7.2.1 =
-
-* Stripe integration fix, better styling of form.
-
-= 7.1.9 =
-
-* Fixes/updates to blocks for embedding single events or elements of single events (just the button, just the form)
-* Fix to confirmation message option for including the event content with the confirmation.
-
-= 7.1.3 =
-
-* Better compatability with Classic Editor
-* Better guidance on Privacy Page setup.
-
-= 7.1.1 =
-
-* Correcting an error in data validation routine.
-
-= 7.1.0 =
-
-* Neater presentation of the essential options to be set including timezone and the creation of a calendar page.
-* Tweaks to Gutenberg code.
-
-= 7.0.6 =
-
-* Most template schedules can now be set from the Gutenberg editor sidebar. For example, First Monday at 7 pm or Every Wednesday at noon. Exception: More complex schedules (First and Third Monday) still require exiting to the RSVP / Event Options screen.  
-
-= 7.0.5 =
-
-* Single event prices can now be set from Gutenberg editor sidebar. Information about additional options that can be edited in RSVP / Event Options also displayed.
-* Improved display on some themes where RSVPMaker posts are displayed in the default index.php (Archive) template, including Twenty Twenty 
-
-= 7.0.1 =
-
-* Updated Stripe support to reflect API that supports newer European regulations for credit card processing (SCA and PSD2).
-* Dropped support, at least for now, for recurring payments (subscriptions) when Stripe is used as a standalone payment button.
-
-= 7.0.0 =
-
-* Fixed error in register_meta function. Updated POT file for translations.
-
-= 6.6.4 =
-
-* Added PHP version check before loading Emogrifier CSS inliner library, which relies on features of PHP 7.1
-
-= 6.6.2 =
-
-* Fix to the option to set relative "days before" times for deadline or registration start in the template and have them calculated and copied to individual event posts.
-* Yet more email template tweaks.
-
-= 6.6.1 =
-
-* More email template tweaks
-
-= 6.6.0 =
-
-* Tweaks to email message templating / styling.
-
-= 6.5.8 =
-
-* Improved Email Template editor. New default template for transactional messages.
-* Inlining of CSS code in HTML email documents, based on the [Emogrifier](https://github.com/MyIntervals/emogrifier) library.
-
-= 6.5.6 =
-
-* Tweaks to timing functions.
-
-= 6.5.5 =
-
-* More sidebar improvements. Now divided into panels, with links to confirmation message and RSVP form posts
-
-= 6.5.4 =
-
-* Better Gutenberg sidebar access to setting start and end time and other basic variables. Multi-date events and event pricing still must be handled through RSVP / Event Options screen.
-
-= 6.5.2 =
-
-* More variables can now be edited through the Gutenberg sidebar, rather than the RSVP / Event Options screen.
-
-= 6.5 =
-
-* Event end time now displayed in Gutenberg interface (still have to click through to RSVP / Event Options screen to change)
-* More compact display of admin bar options on front end (shown as submenu under Edit RSVP Event)
-* Portugese translation (thanks to Letrajato)
-
-= 6.4.4 =
-
-* Fix for email unsubscribes
-
-= 6.4.3 =
-
-* Eliminating the use of create_function (deprecated as of PHP 7.2+) in widget definitions
-
-= 6.4.2 =
-
-* Introducing widget and editor block for dynamically loading lists of events from RSVPMaker API endpoints, using JavaScript and JSON. Can be used to fetch event listings from other sites or to perform better in combination with caching solutions.
-
-= 6.4.1 =
-
-* Fix for issue where RSVP Form did not reset properly if the document was deleted.
-
-= 6.4 =
-
-* Fix for scheduled email (featured message)
-* Fix for default options not being applied correctly on event setup (Add New) screen
-* Option to change event post title when adding events from a template
-
-= 6.3.9 =
-
-* Updated support for PayPal (newer REST API) [blog post](https://rsvpmaker.com/blog/2019/09/09/paypal-rest/)
-
-= 6.3.8 =
-
-* UI tweaks to make it more obvious how to create an event based on a template.
-* Fix for an intermittent glitch that prevented Gutenberg from displaying the proper error message after saving an event post.
-
-= 6.3.7 =
-
-* Adding RSVPMaker Dateblock block - changes placement of date/time block. Same as rsvpdateblock shortcode
-* Adding Placeholder block. Add a note that only appears in the editor, not on the front end. Example: "event description goes here" text for an event template.
-
-= 6.3.6 =
-
-* In a template, option to set deadline and registration start as x days before rather than a specific date
-* When adding event posts from a template, you now have the option to add them as drafts rather than published posts
-* Tweak to function that allows you to jump ahead to a specific date
-
-= 6.3.4 =
-
-* rsvpdateblock shortcode can be inserted in the body of a post, altering where the date and time information appears.
-* Fix to preserve event end time from template to screen for creating an individual event.
-* Additional span elements wrapped around the time display within datetime block. CSS can be used to change display of span.time or span.end_time
-
-= 6.3.4 =
-
-* Fixes to event_listing shortcode
-* Addition of an RSVPMaker event listing Gutenberg block. For showing a listing of just headlines, dates and links to upcoming events.
-
-= 6.3.1 =
-
-* Corrected an issue with editing of the RSVP form. Under some circumstances, WordPress would strip HTML form field tags from the Gutenberg blocks, so now those are formatted on the server.
-* Added Stripe Form Wrapper Gutenberg component. Can be used for simple order forms for payments independent of the RSVP Form.
-
-= 6.2.6 =
-
-* Changed how event end times are set, more consistent with how other calendaring programs do it.
-
-= 6.2.5 =
-
-* If timezone is not set, suggest one based on JavaScript detection of the user's timezone. Uses https://github.com/iansinnott/jstz
-* Bug fix related to multi-day events.
-
-= 6.2.4 =
-
-* Updated German translation files, thanks to Markus König
-
-= 6.2.3 =
-
-* Fixing a glitch that caused duplicate posts to be created when a template is set to automatically generate new events according to the template schedule.
-* Fixed the function for loading blog posts into the RSVP Email editor.
-
-= 6.2.2 =
-
-* Tweaks to the scheduled email function. You can now schedule broadcasts relative to the date of the event or for an arbitrary date and time.
-
-= 6.2.1 =
-
-* Fixes for broken features: links to edit confirmation message, adding RSVP records on the back end (from RSVP Report)
-
-= 6.1.9 =
-
-* Change start time based on template
-* Series of updates in 6.1.6-8 related to confirmation / reminder messages
-* Bug fix for stripe charges in currencies other than usd
-
-= 6.1.5 =
-
-* Prevent WordPress from filtering out form tags in and RSVPMaker form posts (was happening for non-admins in Gutenberg version)
-* Make standard RSVPMaker Upcoming block / shortcode work in email.
-
-= 6.1.4 =
-
-* UX changes. Tweaks to admin bar menu, other navigation labels / methods.
-* Fix for date / time display on new events (using defaults from settings screen, not defaulting to midnight)
-* Fix to the mailer utility, import of an event listing or blog post (body content wasn't being imported correctly)
-
-= 6.1.1 =
-
-* RSVPMaker Setup screen now gives more context on previously published events and works for adding a single event based on a template.
-* Notice after template is saved (in Gutenberg) now gives 2 options: New Event from template or Create / Update events.
-
-= 6.1.0 =
-
-* Trying to fix an issue with confirmation messages / payment buttons not showing up for logged in users.
-* Assigning slug to new draft posts.
-
-= 6.0.7 =
-
-Backwards compatibility for sites not running Gutenberg, specifically for confirmation messages.
-
-= 6.0.6 =
-
-* Important bug fix. Options screen was not working properly
-
-= 6.0.5 =
-
-* Added Edit / Customize RSVP Form to admin bar, where relevant
-* More bug fixes (also 6.0.1 to 6.0.4)
-
-= 6.0 =
-
-* New RSVP form, customizable using the Gutenberg editor.
-* Further refinements to setup for confirmation / reminder messages and navigation back to parent post.
-* RSVP reports can now be run on past events that have been deleted as posts. Event titles and dates are tracked in a separate custom DB table.
-* RSVPMaker Cleanup utility added under tools to make it easier to delete old events.
-
-= 5.9.9 =
-
-* Caching of date lookups to improve performance
-* Fix to author archive lookup query setting (to show events as well as blog posts)
-
-= 5.9.7 =
-
-* Tweaked data model for relationship between confirmation / reminder messages and their parent posts.
-* Updated the Event Templates screen, particularly the features for applying a template to an existing event and for creating a template based on an existing event.
-
-= 5.9.6 =
-
-* Fix for DB performance issues
-* Updates to event reminder messages functions
-
-= 5.9.5 =
-
-* More template options shown on Event Setup screen. Trying to make the choice between creating an individual event and using a template clearer from the user interface.
-* Excluding templates and special documents (such as confirmation messages) from search.
-
-= 5.9.4 =
-
-* Yet a better implementation of the custom Gutenberg notification for RSVPMaker templates (no longer displayed more than once if user saves template again)
-* Bug fix related to date display in email newsletter output.
-
-= 5.9.2 =
-
-* Better implementation of the custom Gutenberg notification for RSVPMaker templates.
-
-= 5.9.1 =
-
-* Notice on Gutenberg editing screen prompting user editing template to create / update individual events
-* Tweak to shortcodes such as rsvpmaker_next
-
-= 5.8.9 =
-
-* Tweaks to Event Options screen, routine for automatically adding a Calendar page (uses block format for WordPress 5.0)
-
-= 5.8.8 =
-
-* After registration, form is no longer displayed on the confirmation page unless the user clicks Update RSVP link (removes a source of confusion)
-* Adding API endpoints /wp-json/rsvpmaker/v1/future /wp-json/rsvpmaker/v1/types /wp-json/rsvpmaker/vi/type/slug-goes-here
-* Fixed display of event types in RSVPMaker Upcoming Events block
-
-= 5.8.6 =
-
-* Fix to coupon codes
-* Multiple Admissions option for pricing (Example: reserving a table of 6, rather than counting host/guests individually)
-
-= 5.8.5 =
-
-* Limited Time Content block now allows you to set expired content to automatically be deleted from a post. By default, expired content is hidden (you can go back and change it or remove it manually). If you have WordPress set to save revisions, deleted content will be preserved as part of a past revision.
-
-= 5.8.4 =
-
-* Support for coupon codes (discount pricing for events)
-* Option to send a payment reminders. If someone registers but does not pay, they will get an email reminder after 30 minutes.
-
-= 5.8.3 =
-
-* Added the Limited Time Content block (a wrapper for content with a start time and/or end time specified for how long it should be displayed)
-
-= 5.8.2 =
-
-Improvements to the Stripe payment functions
-
-= 5.8 =
-
-* Update Template Based on Event option added to admin bar - adjust template based on changes to the latest event in a series, rather than the other way around.
-* If an event is based on a template, Edit Template appears under the main Edit link on the admin bar.
-* Added action - do_action('rsvpmaker_stripe_payment',$vars) - other plugins can detect when a successful Stripe online payment transaction is logged.
-
-= 5.7.9 =
-
-* Native support for Stripe online payments (previously supported through an integration with WP Simple Pay)
-* Stripe Charge block for Gutenberg for processing other sorts of charges, such as dues payments or consulting fees, in addition to event payments.
-
-= 5.7.6 =
-
-* Fix for some issues with items being added twice.
-* RSVP On radio buttons now displayed in Gutenberg sidebar.
-
-= 5.7.5 =
-
-* Bug fix, positioning of navigation links at top and/or bottom of calendar.
-
-= 5.7.4 =
-
-* The guest blanks at the bottom of the RSVP form can now be changed to use another label other than "Guest" and alter the text of the "Add to guests" link. This is not supported by the visual form builder, but you can alter the rsvpguests shortcode with attributes such as [rsvpguests label="Athlete" addmore="Add more athletes"]
-* Send RSVP Email link in admin bar and editor listing for posts and RSVPMaker events.
-
-= 5.7.2 =
-
-* Option to make all notification emails come from the same address (reply to header can be different) to avoid issues with spam filters flagging messages as "spoofed."
-* Code cleanup. Most action calls moved to a separate file. Utilities such as lookups of past and future events moved to rsvpmaker-util.php.
-
-= 5.7.0 =
-
-* WordPress 5.0 / Gutenberg tweaks
-
-= 5.6.8 =
-
-* If you set up reminders associated with an event template, as opposed to an individual event, RSVPMaker will now automatically create a reminders for the next scheduled event in the series and add WordPress cron events for the specified number of hours ahead.
-
-= 5.6.6 =
-
-* Fix for recording units and price when multiple prices offered (for example, adult versus child tickets)
-
-= 5.6.5 =
-
-* Adjusting for a breaking change in the latest Gutenberg release (getSettings function removed from the date component)
-
-= 5.6.4 =
-
-* Fix for potential SQL injection security issue
-
-= 5.6.3 =
-
-* Tested for WordPress 5.0 / Gutenberg
-* Fixed bug with scheduled email broadcasts (featured post for blog roundups)
-* Fixed bug with calendar navigation display of current month
-* Option to set different timezone for individual event
-
-= 5.6.2 =
-
-* Option to limit the size of the export file. You can now also include pages, posts and other WordPress content, in addition to RSVPMaker events.
-
-= 5.6.1 =
-
-* Export RSVPMaker screen added under Tools, plus action hook to clean up imported RSVPMaker event posts.
-
-= 5.5.7 =
-
-* Add Email Options / fix Send Invites links to RSVP Events listing
-* Tweaked the basic form builder for the RSVP form to allow you to set max guests per party
-
-= 5.5.6 =
-
-Fix to feature for adding an editor's note to a scheduled email.
-
-= 5.5.5 =
-
-Fix for RSVP count display.
-
-= 5.5.1 =
-
-* Fixes to make RSVPMaker "special" pages (landing pages, locations) work with Gutenberg turned on.
-* RSVPMaker count of people signed up loaded into event listing via AJAX (prevents issues with caching)
 
 = 5.5 =
 
@@ -754,7 +227,7 @@ Restoring saved locations feature for use with the Classic Editor. Gutenberg ver
 = 4.9.2 =
 
 * Option to have RSVPMaker calculate event fees, even if you haven't set up an online payment service. This "Cash or Custom" option also allows you to add a custom payment gateway.
-* Added hook for custom payment methods, 'rsvpmaker_cash_or_custom' action [documentation](https://rsvpmaker.com/blog/2017/10/18/custom-payment-gateway/)
+* Added hook for custom payment methods, 'rsvpmaker_cash_or_custom' action [documentation](https://rsvpmaker.com/blog/2017/10/18/adding-custom-payment-gateway-rsvpmaker/)
 
 = 4.9.1 =
 
