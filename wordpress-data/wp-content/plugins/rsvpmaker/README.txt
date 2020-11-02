@@ -7,7 +7,7 @@ License: GPLv2
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Requires at least: 3.0
 Tested up to: 4.9.8
-Stable tag: 5.5
+Stable tag: 5.5.8
 
 Schedule events, send invitations, track RSVPs, and collect PayPal payments.
 
@@ -116,6 +116,24 @@ For basic usage, you can also have a look at the [plugin homepage](http://www.rs
 	development kit for PHP.
 
 == Changelog ==
+
+= 5.5.7 =
+
+* Add Email Options / fix Send Invites links to RSVP Events listing
+* Tweaked the basic form builder for the RSVP form to allow you to set max guests per party
+
+= 5.5.6 =
+
+Fix to feature for adding an editor's note to a scheduled email.
+
+= 5.5.5 =
+
+Fix for RSVP count display.
+
+= 5.5.1 =
+
+* Fixes to make RSVPMaker "special" pages (landing pages, locations) work with Gutenberg turned on.
+* RSVPMaker count of people signed up loaded into event listing via AJAX (prevents issues with caching)
 
 = 5.5 =
 

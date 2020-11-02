@@ -152,7 +152,8 @@ if(isset($_POST["edit_month"]))
 		{
 		save_rsvp_template_meta($postID);
 		}
-
+	if(!isset($_POST["sked"]) && !isset($_POST["setrsvp"]))
+		return;
 	if(isset($_POST['add_timezone']) && $_POST['add_timezone'])
 		update_post_meta($postID,'_add_timezone',1);
 	else
@@ -1899,6 +1900,14 @@ elseif( (!isset($rsvp_options["eventpage"]) || empty($rsvp_options["eventpage"])
 add_action('admin_notices', 'rsvpmaker_admin_notice');
 
 function rsvpmailer($mail) {
+	
+	if(defined('RSVPMAILOFF'))
+	{
+		$log = sprintf('<p style="color:red">RSVPMaker Email Disabled</p><pre>%s</pre>',var_export($mail,true));
+		rsvpmaker_debug_log($log,'disabled email');
+		return;
+	}
+	
 	global $rsvp_options;
 	global $post;
 
@@ -3346,6 +3355,7 @@ add_shortcode('rsvpautorenew_test','rsvpautorenew_test');
 
 function rsvpmaker_copy_metadata($source_id, $target_id) {
 global $wpdb;
+$log = '';
 //copy metadata
 $meta_keys = array();
 $post_meta_infos = $wpdb->get_results("SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id=$source_id");
@@ -3359,12 +3369,20 @@ $post_meta_infos = apply_filters('rsvpmaker_meta_update_from_template',$post_met
 				$meta_keys[] = $meta_key;
 				$meta_protect = array('_rsvp_reminder', '_sked', '_edit_lock','_additional_editors','rsvpautorenew');
 				if(in_array($meta_key, $meta_protect) )
-					continue;
+				{
+					$log .= 'Skip '.$meta_key.'<br />';
+					continue;					
+				}
+				else
+				{
+					$log .= 'Copy '.$meta_key.': '.$meta_info->meta_value.'<br />';			
+				}
 				if(is_serialized($meta_info->meta_value))
 					update_post_meta($target_id,$meta_key,unserialize($meta_info->meta_value));
 				else
 					update_post_meta($target_id,$meta_key,$meta_info->meta_value);
 			}
+		//rsvpmaker_debug_log($log,'copy metadata from template '.$source_id.' to '.$target_id);
 		}
 
 $terms = get_the_terms( $source_id, 'rsvpmaker-type' );						
@@ -3428,11 +3446,20 @@ function rsvpmaker_details() {
 <?php
 if(isset($_REQUEST['post_id']))
 	$post = get_post($_REQUEST['post_id']);
-if(isset($_POST['post_id']))
+if(isset($_POST["_require_webinar_passcode"]))
+	{
+	update_post_meta($post->ID,'_require_webinar_passcode',$_POST["_require_webinar_passcode"]);
+	}
+elseif(isset($_POST['post_id']))
 {
 	printf('<div class="notice notice-info"><p>%s</p></div>',__('Saving RSVP Options','rsvpmaker'));
+	if(isset($_POST['setrsvp']))
+	{
 	save_calendar_data($post->ID);
-	save_rsvp_meta($post->ID);
+	save_rsvp_meta($post->ID);		
+	}
+	else
+		do_action('save_post',$post->ID);
 }
 	
 if(empty($post->ID))
@@ -3476,7 +3503,7 @@ printf('<form method="get" action="%s"><input type="hidden" name="post_type" val
 else
 {
 	?>
-<p><?php _e('Use this form for RSVPMaker event registration settings.','rsvpmaker')?> <?php printf('<a href="%s">%s</a>',admin_url('post.php?post='.$post->ID.'&action=edit'),__('Return to editing event post','rsvpmaker'))?></p>	
+<p><?php _e('Use this form for additional RSVPMaker settings.','rsvpmaker')?> <?php printf('<a href="%s">%s</a>',admin_url('post.php?post='.$post->ID.'&action=edit'),__('Return to editor','rsvpmaker'))?></p>	
 	<?php
 printf('<form method="post" action="%s">',admin_url('edit.php?post_type=rsvpmaker&page=rsvpmaker_details&post_id='.$post->ID));
 	
@@ -3486,10 +3513,13 @@ $date = get_rsvp_date($post->ID);
 	
 	$t = strtotime($date);
 	printf('<h3>%s<br />%s</h3>',$post->post_title,$datef);
-	draw_eventdates();
+	$drawresult = draw_eventdates();
+	if($drawresult != 'special')
+	{
 	GetRSVPAdminForm($post->ID);
-if(isset($rsvp_options["additional_editors"]) && $rsvp_options["additional_editors"])
-	additional_editors();
+	if(isset($rsvp_options["additional_editors"]) && $rsvp_options["additional_editors"])
+		additional_editors();		
+	}
 
 submit_button();
 printf('<input type="hidden" name="post_id" value="%d" /></form>',$post->ID);
@@ -3507,8 +3537,8 @@ global $post;
 	wp_enqueue_script( 'jquery-ui-datepicker', array( 'jquery' ) );
 	wp_enqueue_script('jquery-ui-dialog');
 	wp_enqueue_style( 'rsvpmaker_jquery_ui', plugin_dir_url( __FILE__ ) . 'jquery-ui.css',array(),'4.1' );
-	wp_enqueue_script( 'rsvpmaker_admin_script', plugin_dir_url( __FILE__ ) . 'admin.js',array(),'4.9.8' );
-	wp_enqueue_style( 'rsvpmaker_admin_style', plugin_dir_url( __FILE__ ) . 'admin.css',array(),'4.4');
+	wp_enqueue_script( 'rsvpmaker_admin_script', plugin_dir_url( __FILE__ ) . 'admin.js',array(), get_rsvpversion() );
+	wp_enqueue_style( 'rsvpmaker_admin_style', plugin_dir_url( __FILE__ ) . 'admin.css',array(),get_rsvpversion());
 	//add localize_script to show template sked in rest
 	}
 }
@@ -3527,20 +3557,6 @@ function ajax_rsvpmaker_date_handler() {
 	$current_date = get_rsvp_date($post_id);
 	update_post_meta($post_id,'_rsvp_dates',$date,$current_date);		
 	}
-	if(isset($_POST['duration'])) {
-		if(empty($date))
-			$date = get_rsvp_date($post_id);
-	$slug = '_'.$date;
-	if(strpos($_POST['duration'],':'))
-	{
-	$addparts = explode(':',$_POST['duration']);
-	$string = sprintf('%s +%s hours %s minutes',$date,$addparts[0],$addparts[1]);
-	$newdate = date("Y-m-d H:i:s",strtotime($string));
-	}
-	else
-		$newdate = $_POST['duration'];
-	update_post_meta($post_id,$slug,$newdate);	
-	}
     wp_die();
 }
 
@@ -3549,32 +3565,7 @@ add_action( 'wp_ajax_rsvpmaker_template', 'ajax_rsvpmaker_template_handler' );
 function ajax_rsvpmaker_template_handler () {
 	$post_id=$_POST['post_id'];
 	update_post_meta($post_id,'_sked',$_POST['sked']);
-	update_post_meta($post_id,'rsvpautorenew',$_POST['rsvpautorenew']);
-	rsvpmaker_debug_log($_REQUEST,'ajax_rsvpmaker_template_handler');
 	wp_die();
-}
-
-add_action( 'wp_ajax_rsvpmaker_dateformat', 'ajax_rsvpmaker_dateformat_handler' );
-
-function ajax_rsvpmaker_dateformat_handler () {
-	$post_id = (int) $_REQUEST['post_id'];
-	$current_date = get_rsvp_date($post_id);
-	$vars = array('calendar_icons','add_timezone','convert_timezone','rsvp_on');
-	foreach($vars as $v)
-	{
-		$set = (isset($_POST[$v]) && ($_POST[$v] == 'true') ) ? 1 : 0;
-		update_post_meta($post_id,'_'.$v,$set);
-		//rsvpmaker_debug_log($set,'_'.$v.$post_id);
-	}
-	if(isset($_POST['rsvp_on']) && ($_POST['rsvp_on'] == 'true') )
-	{
-		$form = get_post_meta($post_id,"rsvp_form",true);
-		if(empty($form))
-		{
-		rsvpmaker_defaults_for_post($post_id);
-		}
-	}
-    wp_die();	
 }
 
 function rsvpmaker_rest_api_date () {

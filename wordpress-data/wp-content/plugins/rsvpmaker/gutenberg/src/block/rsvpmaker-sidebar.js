@@ -15,6 +15,10 @@ var datestring = '';
 var dateaction = "action=rsvpmaker_date&nonce="+rsvpmaker_ajax.ajax_nonce+"&post_id="+rsvpmaker_ajax.event_id;
 
 function related_link() {
+	if(rsvpmaker_ajax.special)
+		{
+		return <div class="rsvp_related_links"><p><a href={rsvpmaker_ajax.rsvpmaker_details}>Additional Options</a></p></div>;	
+		}
 	if(rsvpmaker_json.projected_url)
 		{
 		return <div class="rsvp_related_links"><p><a href={rsvpmaker_ajax.rsvpmaker_details}>RSVP / Event Options</a></p><p><a href={rsvpmaker_json.projected_url}>{rsvpmaker_json.projected_label}</a></p></div>;	
@@ -52,6 +56,25 @@ if(rsvpmaker_ajax.template_msg)
 																																	<p>{rsvpmaker_ajax.template_msg}</p>
 <p>{__('To change the schedule, follow the link below.')}</p>
 <div class="rsvpmaker_related">
+{related_link()}
+</div>
+{rsvpmaker_ajax.bottom_message}
+</div>
+		)
+	);
+
+	}
+else if(rsvpmaker_ajax.special)
+	{//if this is a template
+		
+	return (
+		el(
+			wp.editPost.PluginPostStatusInfo,
+			{},
+<div>
+<h3>RSVPMaker Special Document</h3>
+{rsvpmaker_ajax.top_message}
+																																	<div class="rsvpmaker_related">
 {related_link()}
 </div>
 {rsvpmaker_ajax.bottom_message}

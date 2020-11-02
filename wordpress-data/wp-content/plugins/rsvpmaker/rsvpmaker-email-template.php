@@ -146,26 +146,18 @@ $cron = get_post_meta($post->ID,'rsvpmaker_cron_email', true);
 if(isset($cron["cronday"]))
 {
 	$subject = $post->post_title;
-	$days = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
-	$t = strtotime($days[$cron["cronday"]]);
-	$stamp = date('Y-m-d',$t);
-	$editorsnote = get_post_meta($post->ID,'editorsnote'.$stamp,true);
-	if(empty($editorsnote))//backwards compat
-		$editorsnote = get_post_meta($post->ID,'editorsnote',true);
-	if(isset($editorsnote["stamp"]) && ($editorsnote["stamp"] == $stamp))
+	$ts = rsvpmaker_next_scheduled($post->ID);
+	$notekey = 'editorsnote'.$ts;
+	$chosen = (int) get_post_meta($post->ID,$notekey,true);
+	if($chosen)
 		{
-		if($editorsnote["chosen"])
-		{
-			$backup = $wp_query;
-			$chosen = $editorsnote["chosen"];
-			$notepost = get_post($chosen);
-			$editorsnote["add_to_head"] = $notepost->post_title;
-			$postparts = explode('<!--more-->',$notepost->post_content);
-			$note = str_replace('<!-- wp:more -->','',$postparts[0]);
-			if(!empty($postparts[1]))
-				$note .= sprintf('<p><a href="%s">%s</a>',get_permalink($chosen),__('Read more','rsvpmaker'));			
-			$editorsnote["note"] = $note;
-		}
+		$notepost = get_post($chosen);
+		$editorsnote["add_to_head"] = $notepost->post_title;
+		$postparts = explode('<!--more-->',$notepost->post_content);
+		$note = str_replace('<!-- wp:more -->','',$postparts[0]);
+		if(!empty($postparts[1]))
+			$note .= sprintf('<p><a href="%s">%s</a>',get_permalink($chosen),__('Read more','rsvpmaker'));			
+		$editorsnote["note"] = $note;
 
 		if(!empty($editorsnote["add_to_head"]))
 		$subject .= ' - ' .$editorsnote["add_to_head"];

@@ -642,6 +642,7 @@ $cron = get_post_meta($post->ID,'rsvpmaker_cron_email',true);
 $chimp_options = get_option('chimp');
 fix_timezone();
 $ts = rsvpmaker_next_scheduled($post->ID);
+$notekey = 'editorsnote'.$ts;
 $next = (!empty($ts)) ? $ts : 'Not set';
 printf('<p>Next broadcast: %s</p>',$ts);
 ?>
@@ -722,18 +723,11 @@ foreach($conditions as $slug => $text)
 <br /><em><?php _e('Broadcast will not be sent if it does not meet this test.','rsvpmaker');?></em>
 </p>
 <?php
-	if($ts)
-	{
-	$stamp = date('Y-m-d',strtotime($ts));		
-	}
-	else
-		$stamp = '';
-$editorsnote = get_post_meta($post->ID,'editorsnote'.$stamp,true);
-if(!isset($editorsnote["stamp"]) || ($editorsnote["stamp"] != $stamp))
-	$editorsnote["add_to_head"] = $editorsnote["note"] = $editorsnote["chosen"] = '';
+	
+$chosen = (int) get_post_meta($post->ID,$notekey,true);
+$editorsnote["add_to_head"] = $editorsnote["note"] = '';
 
 $recent = $wpdb->get_results("SELECT ID, post_title, post_status FROM $wpdb->posts WHERE post_type='post' AND (post_status='publish' OR post_status='draft') ORDER BY ID DESC LIMIT 0,20");
-$chosen = (int) $editorsnote["chosen"];
 if(!empty($recent))
 foreach($recent as $blog)
 	{
@@ -746,21 +740,19 @@ foreach($recent as $blog)
 
 if($chosen)
 {
-	if(empty($chosentitle))
-	{
-		$blog = get_post($chosen);
-		$chosentitle = $blog->post_title;
-	$blog_options .= sprintf('<option value="%d" selected="selected">%s</option>',$blog->ID,$blog->post_title);
-	}
+	$blog = get_post($chosen);
+	$chosentitle = $blog->post_title;
+	$blog_options .= sprintf('<option value="%d" selected="selected">%s</option><option value="">(Clear Selection)</option>',$blog->ID,$blog->post_title);
 	printf('<p>The current editor\'s note is based on the blog post <strong>%s</strong>. <a href="%s">(Edit)</a></p>',$chosentitle,admin_url('post.php?action=edit&post='.$chosen));
+	echo "<p>notekey $notekey</p>";
 }
 ?>
 <h3 id="editorsnote"><?php _e("Add Editor's Note for",'rsvpmaker'); if(empty($stamp)) echo ' Next broadcast'; else echo ' '.$ts;?></h3>
-<input type="hidden" name="editorsnote[stamp]" value="<?php echo $stamp; ?>">
+<input type="hidden" name="notekey" value="<?php echo $notekey; ?>">
 
 <p><?php _e("A blog post, either public or draft, can be featured as the editor's note at the top of your next email newsletter broadcast. The content of the post title will be added to the end of the email subject line, and the content of the post (up to the more tag, if included) will be included in the body of your email. There are two ways to add an Editor's Note blog post.",'rsvpmaker');?></p>
 
-<p><strong>1. <?php _e('Pick a blog post to feature','rsvpmaker');?>:</strong> <select name="editorsnote[chosen]"><option value=""><?php _e('Select Blog Post','rsvpmaker');?></option><?php echo $blog_options; ?></select></p>
+<p><strong>1. <?php _e('Pick a blog post to feature','rsvpmaker');?>:</strong> <select name="chosen"><option value=""><?php _e('Select Blog Post','rsvpmaker');?></option><?php echo $blog_options; ?></select></p>
 
 <p><strong>2. <?php _e('Enter a message below','rsvpmaker');?>.</strong> (<?php _e('A draft blog post will be created. Making it public on the blog is optional.','rsvpmaker');?>)</p>
 
@@ -863,14 +855,13 @@ if(!empty($_POST["email"]["from_name"]))
 				delete_post_meta($postID, $field, $current);
 			}
 	}
-	if(isset($_POST["editorsnote"]) || isset($_POST["cron_active"])) {
-	$ednote = (isset($_POST["editorsnote"])) ? $_POST["editorsnote"] : '';
-	if(empty($ednote['stamp']))
+	if(isset($_POST["cron_active"])) {
+	$chosen = (int) $_POST["chosen"]; 
+	if(empty($_POST['cronday']))
 	{
 		$cronday = (int) $_POST['cronday'];
 		$days = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
 		$day = $days[$cronday];
-		$ednote['stamp'] = date('Y-m-d',strtotime($day));
 	}
 	if(!empty($_POST['notesubject']) || !empty($_POST['notebody']))
 	{
@@ -880,9 +871,11 @@ if(!empty($_POST["email"]["from_name"]))
 		$newpost['post_type'] = 'post';
 		$newpost['post_status'] = $_POST['status'];
 		$newpost['post_author'] = $current_user->ID;
-		$ednote['chosen'] = wp_insert_post( $newpost );
+		$chosen = wp_insert_post( $newpost );
 	}
-	update_post_meta($postID,'editorsnote'.$ednote['stamp'],$ednote);
+	
+	if(!empty($_POST['notekey']))	
+		update_post_meta($postID,$_POST['notekey'],$chosen);
 
 	$args = array('post_id' => $postID);
 	$cron_checkboxes = array("cron_active", "cron_mailchimp", "cron_members", "cron_preview");
@@ -896,7 +889,6 @@ if(!empty($_POST["email"]["from_name"]))
 		//clear if previously set
 		wp_clear_scheduled_hook( 'rsvpmaker_cron_email', $args );
 		wp_clear_scheduled_hook( 'rsvpmaker_cron_email_preview', $args );
-
 
 			$cron_fields = array("cronday", "cronhour", "cronrecur","cron_condition");
 			foreach($cron_fields as $field)
@@ -1379,6 +1371,11 @@ do_action("rsvpmaker_email_send_ui_options");
 </form>
 <p><a href="<?php echo $edit_link; ?>"><?php _e('Edit','rsvpmaker');?></a> - <a href="<?php echo admin_url(); ?>"><?php _e('Dashboard','rsvpmaker');?></a> - <a href="<?php echo site_url(); ?>"><?php _e('Visit Site','rsvpmaker');?></a></p>
 <?php
+
+$ts = rsvpmaker_next_scheduled($post->ID);
+if($ts)
+	printf('<p><a href="%s">Preview scheduled broadcast</a> for %s',add_query_arg('cronemailpreview',$post->ID,$permalink),$ts);
+	
 return '<div style="background-color: #FFFFFF; color: #000000;">'.ob_get_clean().'</div>';
 }
 
@@ -2005,6 +2002,8 @@ function event_to_embed($post_id, $embed = NULL) {
 <!-- /wp:paragraph -->',$dateblock).$tmlogin;			
 		}
 		$content = do_shortcode($post->post_content);
+		if(get_post_meta($post_id,'_rsvp_count',true))
+			$content .= rsvpcount($post_id);
 		$event_embed["content"] .= $content;
 		if(get_post_meta($post_id,'_rsvp_on',true))
 		{
@@ -2016,7 +2015,7 @@ function event_to_embed($post_id, $embed = NULL) {
 		}
 		$post = $backup;
 		if(!function_exists('do_blocks')){
-			$event_embed["content"] = preg_replace('/<!--(.*)-->/Uis', '', $event_embed["content"]);
+			$event_embed["content"] = preg_replace('/<!--([^>]+)>/Uis', '', $event_embed["content"]);
 			$event_embed["content"] = wpautop($event_embed["content"]);
 		}
 		return $event_embed;
@@ -2072,6 +2071,16 @@ $wp_query = new WP_Query( array('post_type' => 'rsvpemail','p' => $post_id) );
 include plugin_dir_path(__FILE__) . 'rsvpmaker-email-template.php';
 }
 
+function rsvpmaker_cron_email_preview_now() {
+	if(isset($_GET['cronemailpreview']))
+	{
+		rsvpmaker_cron_email_preview($_GET['cronemailpreview']);
+		die('scheduled email preview');
+	}
+}
+
+add_action('init','rsvpmaker_cron_email_preview_now');
+
 add_action('rsvpmaker_cron_email_preview','rsvpmaker_cron_email_preview');
 add_action('rsvpmaker_cron_email','rsvpmaker_cron_email_send');
 
@@ -2081,8 +2090,8 @@ function rsvpmaker_row_actions( $actions, WP_Post $post ) {
     if ( $post->post_type != 'rsvpmaker' ) {
         return $actions;
     }
-
-    $actions['rsvpmaker_invite'] = sprintf('<a href="%s">%s</a>',admin_url('/post-new.php?post_type=rsvpemail&event=').$post->ID,__('Send Invitation','rsvpmaker'));
+	$actions['rsvpmaker_options'] = sprintf('<a href="%s">%s</a>',admin_url('edit.php?post_type=rsvpmaker&page=rsvpmaker_details&post_id=').$post->ID,__('Event Options','rsvpmaker'));
+    $actions['rsvpmaker_invite'] = sprintf('<a href="%s">%s</a>',admin_url('?rsvpevent_to_email=').$post->ID,__('Send Invitation','rsvpmaker'));
     return $actions;
 }
 
@@ -2108,8 +2117,9 @@ $was = $post;
 global $blog_weeks_ago;
 $blog_weeks_ago = (!empty($atts["weeks"])) ? $atts["weeks"] : 1;
 
-$editorsnote = get_post_meta($post->ID,'editorsnote',true);
-$chosen = (empty($editorsnote["chosen"])) ? 0 : $editorsnote["chosen"];
+$ts = rsvpmaker_next_scheduled($post->ID);
+$notekey = 'editorsnote'.$ts;
+$chosen = (int) get_post_meta($post->ID,$notekey,true);
 
 add_filter('posts_where', 'filter_where_recent');
 query_posts('post_type=post');
@@ -2302,7 +2312,7 @@ foreach($template_forms as $slug => $form)
 echo submit_button().'</form>';
 
 
-echo   '<p>'.__("RSVPMaker template placeholders:<br />[rsvpyesno] YES/NO<br />[rsvptitle] event post title<br />[rsvpdate] event date<br />[rsvpmessage] the message you supplied when you created/edited the event (default is Thank you!)<br />[rsvpdetails] information supplied by attendee<br />[rsvpupdate] button users can click on to update their RSVP",'rsvpmaker').'</p>';
+echo   '<p>'.__("RSVPMaker template placeholders:<br />[rsvpyesno] YES/NO<br />[rsvptitle] event post title<br />[rsvpdate] event date<br />[rsvpmessage] the message you supplied when you created/edited the event (default is Thank you!)<br />[rsvpdetails] information supplied by attendee<br />[rsvpupdate] button users can click on to update their RSVP<br />[rsvpcount] number of people registered",'rsvpmaker').'</p>';
 do_action('rsvpmaker_notification_templates_doc');
 rsvpmaker_admin_page_bottom($hook);
 }
@@ -2327,6 +2337,33 @@ foreach($template_forms as $slug => $form)
 return $templates;
 }
 
+add_shortcode('rsvpcount','rsvpcount');
+function rsvpcount ($atts) {
+global $wpdb;
+global $post;
+if(isset($atts['post_id']))
+	$post_id = (int) $atts['post_id'];
+elseif(!empty($atts) && is_numeric($atts))
+	$post_id = $atts;
+else
+	$post_id = $post->ID;
+	
+rsvpmaker_debug_log($atts,'rspcount atts');
+rsvpmaker_debug_log($post_id,'rspcount post_id');
+	
+if(!$post_id)
+	return;
+$sql = "SELECT count(*) FROM ".$wpdb->prefix."rsvpmaker WHERE event=$post_id AND yesno=1 ORDER BY id DESC";
+rsvpmaker_debug_log($sql,'rspcount sql');
+$total = (int) $wpdb->get_var($sql);
+rsvpmaker_debug_log($total,'rspcount total');
+$rsvp_max = get_post_meta($post_id,'_rsvp_max',true);
+$output = $total.' '.__('signed up so far.','rsvpmaker');
+if($rsvp_max)
+	$output .= ' '.__('Limit','rsvpmaker').': '.$rsvp_max;
+return '<p class="signed_up">'.$output.'</p>';
+}
+
 function rsvp_notifications_via_template ($rsvp,$rsvp_to,$rsvpdata) {
 global $post;
 global $rsvp_options;
@@ -2341,6 +2378,7 @@ foreach($rsvpdata as $field => $value)
 $notification_body = $templates['notification']['body']; 
 foreach($rsvpdata as $field => $value)
 	$notification_body = str_replace('['.$field.']',$value,$notification_body);
+	$notification_body = do_shortcode($notification_body);
 
 	$rsvp_to_array = explode(",", $rsvp_to);
 	foreach($rsvp_to_array as $to)

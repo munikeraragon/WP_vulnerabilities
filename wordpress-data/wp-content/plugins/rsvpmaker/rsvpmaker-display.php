@@ -1526,8 +1526,25 @@ if(!isset($atts["hide_title"]) || !$atts["hide_title"])
 ?>
 <div class="rsvpmaker-entry-content">
 
-<?php the_content(); ?>
-
+<?php 
+	
+	if($atts["one_format"] == 'button') {
+		$content = embed_dateblock($atts);
+	if(is_rsvpmaker_future($post_id)) 
+		{
+		$rsvplink = get_permalink($post_id);
+		if(strpos($rsvplink,'?') )
+			$rsvp_options["rsvplink"] = str_replace('?','&',$rsvp_options["rsvplink"]);
+		$rsvp = sprintf($rsvp_options['rsvplink'],$rsvplink);
+		}
+	else
+		{
+		$rsvp = __('Event date is past','rsvpmaker');
+		}
+	echo $content.'<div style="margin-top: 10px;">'.$rsvp.'</div>';
+	}
+	else
+		the_content(); ?>
 </div><!-- .entry-content -->
 
 <?php
@@ -1880,4 +1897,25 @@ function sked_to_text ($sked) {
 	return $dateblock;
 }
 
+
+function signed_up_ajax () {
+if(empty($_REQUEST['action']) || $_REQUEST['action'] != 'signed_up')
+	return;	
+if(!isset($_GET['event_count']))
+	return;
+global $wpdb;
+$post_id = $_GET['event_count'];
+$sql = "SELECT count(*) FROM ".$wpdb->prefix."rsvpmaker WHERE event=$post_id AND yesno=1 ORDER BY id DESC";
+$total = (int) $wpdb->get_var($sql);
+$rsvp_max = get_post_meta($post_id,'_rsvp_max',true);
+if($total)
+{
+$output = $total.' '.__('signed up so far.','rsvpmaker');
+if($rsvp_max)
+	$output .= ' '.__('Limit','rsvpmaker').': '.$rsvp_max;
+echo '<p class="signed_up">'.$output.'</p>';
+}
+die();
+}
+add_action('init','signed_up_ajax');
 ?>

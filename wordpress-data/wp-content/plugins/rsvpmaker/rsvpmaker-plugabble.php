@@ -44,7 +44,7 @@ if(isset($custom_fields["_rsvpmaker_special"][0]))
 	else
 		do_action('rsvpmaker_special_metabox',$rsvpmaker_special);
 	
-	return;
+	return 'special';
 	}
 elseif(isset($custom_fields["_sked"][0]) || isset($_GET["new_template"]) )
 	{
@@ -61,7 +61,7 @@ if(isset($custom_fields["_meet_recur"][0]))
 	{
 		$t = (int) $custom_fields["_meet_recur"][0];
 if($post_id)
-printf('<p><a href="%s">%s</a> | <a href="%s">%s</a> | <a href="%s">%s</a></p>',admin_url('post.php?action=edit&post='.$t),__('Edit Template','rsvpmaker'),admin_url('edit.php?post_type=rsvpmaker&page=rsvpmaker_template_list&t='.$t),__('See Related Events','rsvpmaker'),admin_url('edit.php?post_type=rsvpmaker&page=rsvpmaker_template_list&apply_target='.$post->ID.'&apply_current='.$t.'#applytemplate
+printf('<p><a href="%s">%s</a> | <a href="%s">%s</a> | <a href="%s">%s</a> | <a href="%s">%s</a></p>',admin_url('post.php?action=edit&post='.$t),__('Edit Template Content','rsvpmaker'),admin_url('edit.php?post_type=rsvpmaker&page=rsvpmaker_details&post_id='.$t), __('Edit Template Options','rsvpmaker'), admin_url('edit.php?post_type=rsvpmaker&page=rsvpmaker_template_list&t='.$t),__('See Related Events','rsvpmaker'),admin_url('edit.php?post_type=rsvpmaker&page=rsvpmaker_template_list&apply_target='.$post->ID.'&apply_current='.$t.'#applytemplate
 '),__('Switch Template','rsvpmaker'));
 	}
 elseif(isset($post->ID))
@@ -722,19 +722,21 @@ $emailfirst = ($match[1] == 'email') ? ' checked="checked" ' : '';
 	  <option value="name_first" <?php if(!$emailfirst && !$hidden) echo 'selected="selected"'; ?> ><?php _e('name, then email','rsvpmaker');?></option>
 	  <option value="hidden" <?php if($hidden) echo 'selected="selected"'; ?> ><?php _e('hidden (use with login required)','rsvpmaker');?></option>
 	  </select>
-</p>
-  <p><?php _e('For radio buttons or select fields, use the format Label:option 1, option 2','rsvpmaker');?> (<em><?php _e('Meal:Steak,Chicken,Vegitarian','rsvpmaker');?></em>)</p> 
+<br /><?php _e('For radio buttons or select fields, use the format Label:option 1, option 2','rsvpmaker');?> (<em><?php _e('Meal:Steak,Chicken,Vegitarian','rsvpmaker');?></em>)</p> 
     <fieldset>
 <?php
 	
 preg_match_all('/(\[.+\])/',$rsvp_form,$matches);
+preg_match('/max_party="(\d+")/',$rsvp_form,$maxparty);
 $codes = implode($matches[1]);
 $codes .= '[rsvpfield textfield=""][rsvpfield textfield=""][rsvpfield textfield=""]';
 echo do_shortcode($codes);
 global $extrafield;
 printf('<input type="hidden" id="extrafields" value="%s" />',$extrafield);
+$mp = (empty($maxparty[1])) ? '' : $maxparty[1] - 1;
 ?>
-<p><input type="checkbox" name="guests" id="guests" value="1" <?php if(strpos($rsvp_form,'rsvpguests')) echo 'checked="checked"'; ?> /> <?php _e('Include guest form','rsvpmaker');?> <input type="checkbox" name="note" id="note" value="1" <?php if(strpos($rsvp_form,'rsvpnote')) echo 'checked="checked"'; ?>> <?php _e('Include notes field','rsvpmaker');?> <input type="checkbox" name="emailcheckbox" id="emailcheckbox" value="1" <?php if($email_list_ok) echo 'checked="checked"'; ?> > <?php _e('Include "Add me to email list" checkbox','rsvpmaker');?></p>
+<p><input type="checkbox" name="guests" id="guests" value="1" <?php if(strpos($rsvp_form,'rsvpguests')) echo 'checked="checked"'; ?> /> <?php _e('Include guest form','rsvpmaker');?> - <?php _e('up to','rsvpmaker'); ?> <input type="text" name="maxguests" id="maxguests" value="<?php echo $mp; ?>" size="2" /> <?php _e(' guests (enter # or leave blank for no limit)','rsvpmaker');?><br /> <input type="checkbox" name="note" id="note" value="1" <?php if(strpos($rsvp_form,'rsvpnote')) echo 'checked="checked"'; ?>> <?php _e('Include notes field','rsvpmaker');?> <input type="checkbox" name="emailcheckbox" id="emailcheckbox" value="1" <?php if($email_list_ok) echo 'checked="checked"'; ?> > <?php _e('Include "Add me to email list" checkbox','rsvpmaker');?></p>
+<p><input type="checkbox" name="guests" id="guests" value="1" <?php if(strpos($rsvp_form,'rsvpguests')) echo 'checked="checked"'; ?> /> <?php _e('Include guest form','rsvpmaker');?> - <?php _e('up to','rsvpmaker'); ?> <input type="text" name="maxguests" id="maxguests" value="<?php echo $mp; ?>" size="2" /> <?php _e(' guests (enter # or leave blank for no limit)','rsvpmaker');?><br /> <input type="checkbox" name="note" id="note" value="1" <?php if(strpos($rsvp_form,'rsvpnote')) echo 'checked="checked"'; ?>> <?php _e('Include notes field','rsvpmaker');?> <input type="checkbox" name="emailcheckbox" id="emailcheckbox" value="1" <?php if($email_list_ok) echo 'checked="checked"'; ?> > <?php _e('Include "Add me to email list" checkbox','rsvpmaker');?></p>
       <!-- Allow form submission with keyboard without duplicating the dialog button -->
       <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
     </fieldset>
@@ -1697,10 +1699,10 @@ global $rsvp_options;
 	wp_enqueue_script('jquery');
 	wp_enqueue_script('jquery-ui-tooltip');
 	$myStyleUrl = (isset($rsvp_options["custom_css"]) && $rsvp_options["custom_css"]) ? $rsvp_options["custom_css"] : WP_PLUGIN_URL . '/rsvpmaker/style.css';
-	wp_register_style('rsvp_style', $myStyleUrl, array(), '4.5.2');
+	wp_register_style('rsvp_style', $myStyleUrl, array(), get_rsvpversion());
 	wp_enqueue_style( 'rsvp_style');
 	wp_localize_script( 'rsvpmaker_ajaxurl', 'ajaxurl', admin_url('admin-ajax.php') );
-	wp_enqueue_script('rsvpmaker_js',plugins_url('rsvpmaker/rsvpmaker.js'), array(), 0.8);
+	wp_enqueue_script('rsvpmaker_js',plugins_url('rsvpmaker/rsvpmaker.js'), array(), get_rsvpversion());
 } } // end event scripts
 
 add_action('wp_enqueue_scripts','rsvpmaker_event_scripts',10000);
@@ -2086,13 +2088,9 @@ if(isset($rsvp_max) && $rsvp_max)
 else
 	$blanks_allowed = 1000;
 
-// never show count of 0
-if($total && isset($rsvp_max) && $rsvp_max && (isset($rsvp_count) && $rsvp_count))
-	{
-	$content .= '<p class="signed_up">'.$total.' '.__('signed up so far. Limit: ','rsvpmaker'). "$rsvp_max.</p>\n";
-	}
-elseif($total && (!isset($rsvp_count) || (isset($rsvp_count) && $rsvp_count)  ))
-	$content .= '<p class="signed_up">'.$total.' '. __('signed up so far.','rsvpmaker').'</p>';
+if($rsvp_count) {
+	$content .= '<div class="signed_up_ajax" id="signed_up_'.$post->ID.'" post="'.$post->ID.'"></div>';
+}	
 
 $now = current_time('timestamp');
 $rsvplink = ($login_required) ? wp_login_url( get_permalink( $post->ID ) ) : get_permalink( $post->ID );

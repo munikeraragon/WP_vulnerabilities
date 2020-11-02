@@ -74,8 +74,16 @@ function rsvpmaker_block_cgb_editor_assets() {
 		$template_label = '';
 		$template_url = '';
 		$template_msg = '';
+		$top_message = '';
+		$bottom_message= '';
 
 		$sked = get_post_meta($post->ID,'_sked',true);
+		$rsvpmaker_special = get_post_meta($post->ID,'_rsvpmaker_special',true);
+		if(!empty($rsvpmaker_special))
+			$top_message = $rsvpmaker_special;
+		$top_message = apply_filters('rsvpmaker_ajax_top_message',$top_message);
+		$bottom_message = apply_filters('rsvpmaker_ajax_bottom_message',$bottom_message);
+		
 		if($sked)
 		{
 			$projected_label = __('Create/update events from template','rsvpmaker');
@@ -90,7 +98,7 @@ function rsvpmaker_block_cgb_editor_assets() {
 		}
 
 		$rsvpmaker_json = array('projected_label' => $projected_label,'projected_url' => $projected_url,'template_label' => $template_label,'template_url' => $template_url);
-
+		
 		wp_localize_script( 'rsvpmaker_block-cgb-block-js', 'rsvpmaker_json', $rsvpmaker_json );	
 		
 $post_id = (empty($post->ID)) ? 0 : $post->ID;
@@ -121,9 +129,10 @@ $post_id = (empty($post->ID)) ? 0 : $post->ID;
 			'template_msg' => $template_msg,
 			'event_id' => $post_id,
 			'template_id' => $template_id,
+			'special' => $rsvpmaker_special,
 			'rsvpmaker_details' => admin_url('edit.php?post_type=rsvpmaker&page=rsvpmaker_details&post_id='.$post_id),
-			'top_message' => apply_filters('rsvpmaker_ajax_top_message',''),
-			'bottom_message' => apply_filters('rsvpmaker_ajax_bottom_message',''),
+			'top_message' => $top_message,
+			'bottom_message' => $bottom_message,
         )
     );
 	if(isset($post->post_type) && ($post->post_type == 'rsvpmaker'))

@@ -70,7 +70,10 @@ for(i=1; i <= extrafields; i++)
 
 	if(extras != '')
 		newform = newform.concat(extras);
-	if( $('#guests').is(':checked') )
+	var maxguests = parseInt($('#maxguests').val());
+	if( $('#guests').is(':checked') && maxguests)
+		newform = newform.concat('[rsvpguests max_party="'+(maxguests + 1)+'"]'+"\n");
+	else if( $('#guests').is(':checked') )
 		newform = newform.concat('[rsvpguests]'+"\n");
 	if( $('#note').is(':checked') )
 		newform = newform.concat(note);			
