@@ -31,6 +31,17 @@ services:
       MYSQL_RANDOM_ROOT_PASSWORD: '1'
     volumes:
       - db:/var/lib/mysql
+  phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      restart: always
+      ports:
+          - "81:80"
+      expose:
+          - 81
+      environment:
+          PMA_HOST: db
+      depends_on:
+        - db
 
 volumes:
   wordpress:
