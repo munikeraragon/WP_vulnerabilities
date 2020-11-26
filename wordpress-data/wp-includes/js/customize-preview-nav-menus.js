@@ -1,6 +1,4 @@
 /* global _wpCustomizePreviewNavMenusExports */
-
-/** @namespace wp.customize.navMenusPreview */
 wp.customize.navMenusPreview = wp.customize.MenusCustomizerPreview = ( function( $, _, wp, api ) {
 	'use strict';
 
@@ -74,14 +72,11 @@ wp.customize.navMenusPreview = wp.customize.MenusCustomizerPreview = ( function(
 		/**
 		 * Partial representing an invocation of wp_nav_menu().
 		 *
-		 * @memberOf wp.customize.navMenusPreview
-		 * @alias wp.customize.navMenusPreview.NavMenuInstancePartial
-		 *
 		 * @class
 		 * @augments wp.customize.selectiveRefresh.Partial
 		 * @since 4.5.0
 		 */
-		self.NavMenuInstancePartial = api.selectiveRefresh.Partial.extend(/** @lends wp.customize.navMenusPreview.NavMenuInstancePartial.prototype */{
+		self.NavMenuInstancePartial = api.selectiveRefresh.Partial.extend({
 
 			/**
 			 * Constructor.
@@ -424,7 +419,7 @@ wp.customize.navMenusPreview = wp.customize.MenusCustomizerPreview = ( function(
 				return;
 			}
 
-			navMenuItemParts = $( this ).attr( 'class' ).match( /(?:^|\s)menu-item-(-?\d+)(?:\s|$)/ );
+			navMenuItemParts = $( this ).attr( 'class' ).match( /(?:^|\s)menu-item-(\d+)(?:\s|$)/ );
 			if ( navMenuItemParts ) {
 				e.preventDefault();
 				e.stopPropagation(); // Make sure a sub-nav menu item will get focused instead of parent items.

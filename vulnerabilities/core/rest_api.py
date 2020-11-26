@@ -60,9 +60,7 @@ def update_post(api_base, post_id, post_content):
     # more than just the content field can be updated. see the api docs here:
     # https://developer.wordpress.org/rest-api/reference/posts/#update-a-post
 
-    data = json.dumps({
-        'content': post_content
-    }).encode('utf8')
+    data = post_content.encode(encoding='UTF-8', errors='strict')
 
 
     url = api_base + 'wp/v2/posts/{post_id}/?id={post_id}abc'.format(post_id=post_id)
@@ -104,7 +102,6 @@ if __name__ == '__main__':
     print('* Updating post {0}'.format(sys.argv[2]))
     with open(sys.argv[3], 'r') as content:
         new_content = content.readlines()
-
     update_post(api_url, sys.argv[2], ''.join(new_content))
 
     print('* Update complete!')

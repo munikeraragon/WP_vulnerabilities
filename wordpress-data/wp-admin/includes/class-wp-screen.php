@@ -18,6 +18,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var string
+	 * @access public
 	 */
 	public $action;
 
@@ -27,6 +28,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var string
+	 * @access public
 	 */
 	public $base;
 
@@ -35,6 +37,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.4.0
 	 * @var int
+	 * @access private
 	 */
 	private $columns = 0;
 
@@ -43,6 +46,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var string
+	 * @access public
 	 */
 	public $id;
 
@@ -51,6 +55,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.5.0
 	 * @var string
+	 * @access protected
 	 */
 	protected $in_admin;
 
@@ -62,6 +67,7 @@ final class WP_Screen {
 	 * @since 3.3.0
 	 * @deprecated 3.5.0
 	 * @var bool
+	 * @access public
 	 */
 	public $is_network;
 
@@ -73,6 +79,7 @@ final class WP_Screen {
 	 * @since 3.3.0
 	 * @deprecated 3.5.0
 	 * @var bool
+	 * @access public
 	 */
 	public $is_user;
 
@@ -83,6 +90,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var string
+	 * @access public
 	 */
 	public $parent_base;
 
@@ -92,6 +100,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var string
+	 * @access public
 	 */
 	public $parent_file;
 
@@ -102,6 +111,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var string
+	 * @access public
 	 */
 	public $post_type;
 
@@ -110,6 +120,7 @@ final class WP_Screen {
 	 * The 'edit-tags.php?taxonomy=category' screen has a taxonomy of 'category'.
 	 * @since 3.3.0
 	 * @var string
+	 * @access public
 	 */
 	public $taxonomy;
 
@@ -118,6 +129,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var array
+	 * @access private
 	 */
 	private $_help_tabs = array();
 
@@ -126,6 +138,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var string
+	 * @access private
 	 */
 	private $_help_sidebar = '';
 
@@ -133,6 +146,7 @@ final class WP_Screen {
 	 * The accessible hidden headings and text associated with the screen, if any.
 	 *
 	 * @since 4.4.0
+	 * @access private
 	 * @var array
 	 */
 	private $_screen_reader_content = array();
@@ -141,6 +155,7 @@ final class WP_Screen {
 	 * Stores old string-based help.
 	 *
 	 * @static
+	 * @access private
 	 *
 	 * @var array
 	 */
@@ -151,6 +166,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var array
+	 * @access private
 	 */
 	private $_options = array();
 
@@ -160,6 +176,7 @@ final class WP_Screen {
 	 * @since 3.3.0
 	 *
 	 * @static
+	 * @access private
 	 *
 	 * @var array
 	 */
@@ -170,6 +187,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var bool
+	 * @access private
 	 */
 	private $_show_screen_options;
 
@@ -178,6 +196,7 @@ final class WP_Screen {
 	 *
 	 * @since 3.3.0
 	 * @var string
+	 * @access private
 	 */
 	private $_screen_settings;
 
@@ -185,6 +204,7 @@ final class WP_Screen {
 	 * Fetches a screen object.
 	 *
 	 * @since 3.3.0
+	 * @access public
 	 *
 	 * @static
 	 *
@@ -270,9 +290,7 @@ final class WP_Screen {
 
 			switch ( $base ) {
 				case 'post' :
-					if ( isset( $_GET['post'] ) && isset( $_POST['post_ID'] ) && (int) $_GET['post'] !== (int) $_POST['post_ID'] )
-						wp_die( __( 'A post ID mismatch has been detected.' ), __( 'Sorry, you are not allowed to edit this item.' ), 400 );
-					elseif ( isset( $_GET['post'] ) )
+					if ( isset( $_GET['post'] ) )
 						$post_id = (int) $_GET['post'];
 					elseif ( isset( $_POST['post_ID'] ) )
 						$post_id = (int) $_POST['post_ID'];
@@ -289,9 +307,6 @@ final class WP_Screen {
 				case 'term' :
 					if ( null === $post_type && is_object_in_taxonomy( 'post', $taxonomy ? $taxonomy : 'post_tag' ) )
 						$post_type = 'post';
-					break;
-				case 'upload':
-					$post_type = 'attachment';
 					break;
 			}
 		}
@@ -382,6 +397,7 @@ final class WP_Screen {
 	 * Constructor
 	 *
 	 * @since 3.3.0
+	 * @access private
 	 */
 	private function __construct() {}
 
@@ -899,8 +915,7 @@ final class WP_Screen {
 
 		switch ( $this->base ) {
 			case 'widgets':
-				$nonce = wp_create_nonce( 'widgets-access' );
-				$this->_screen_settings = '<p><a id="access-on" href="widgets.php?widgets-access=on&_wpnonce=' . urlencode( $nonce ) . '">' . __('Enable accessibility mode') . '</a><a id="access-off" href="widgets.php?widgets-access=off&_wpnonce=' . urlencode( $nonce ) . '">' . __('Disable accessibility mode') . "</a></p>\n";
+				$this->_screen_settings = '<p><a id="access-on" href="widgets.php?widgets-access=on">' . __('Enable accessibility mode') . '</a><a id="access-off" href="widgets.php?widgets-access=off">' . __('Disable accessibility mode') . "</a></p>\n";
 				break;
 			case 'post' :
 				$expand = '<fieldset class="editor-expand hidden"><legend>' . __( 'Additional settings' ) . '</legend><label for="editor-expand-toggle">';
@@ -1022,10 +1037,7 @@ final class WP_Screen {
 					update_user_meta( get_current_user_id(), 'show_welcome_panel', $welcome_checked );
 				} else {
 					$welcome_checked = get_user_meta( get_current_user_id(), 'show_welcome_panel', true );
-					if ( '' === $welcome_checked ) {
-						$welcome_checked = '1';
-					}
-					if ( '2' === $welcome_checked && wp_get_current_user()->user_email != get_option( 'admin_email' ) ) {
+					if ( 2 == $welcome_checked && wp_get_current_user()->user_email != get_option( 'admin_email' ) ) {
 						$welcome_checked = false;
 					}
 				}
@@ -1033,7 +1045,6 @@ final class WP_Screen {
 				echo '<input type="checkbox" id="wp_welcome_panel-hide"' . checked( (bool) $welcome_checked, true, false ) . ' />';
 				echo _x( 'Welcome', 'Welcome panel' ) . "</label>\n";
 			}
-
 		?>
 		</fieldset>
 		<?php
@@ -1070,12 +1081,9 @@ final class WP_Screen {
 				continue;
 			}
 
-			/*
-			 * The Comments column uses HTML in the display name with some screen
-			 * reader text. Make sure to strip tags from the Comments column
-			 * title and any other custom column title plugins might add.
-			 */
-			$title = wp_strip_all_tags( $title );
+			if ( 'comments' == $column ) {
+				$title = __( 'Comments' );
+			}
 
 			$id = "$column-hide";
 			echo '<label>';
@@ -1154,7 +1162,7 @@ final class WP_Screen {
 			$per_page = apply_filters( 'edit_categories_per_page', $per_page );
 		} else {
 			/** This filter is documented in wp-admin/includes/class-wp-list-table.php */
-			$per_page = apply_filters( "{$option}", $per_page );
+			$per_page = apply_filters( $option, $per_page );
 		}
 
 		// Back compat
@@ -1184,8 +1192,6 @@ final class WP_Screen {
 	 * Render the list table view mode preferences.
 	 *
 	 * @since 4.4.0
-	 *
-	 * @global string $mode List table view mode.
 	 */
 	public function render_view_mode() {
 		$screen = get_current_screen();
@@ -1203,7 +1209,7 @@ final class WP_Screen {
 		 * @since 4.4.0
 		 *
 		 * @param array $view_mode_post_types Array of post types that can change view modes.
-		 *                                    Default non-hierarchical post types with show_ui on.
+		 *                                    Default hierarchical post types with show_ui on.
 		 */
 		$view_mode_post_types = apply_filters( 'view_mode_post_types', $view_mode_post_types );
 

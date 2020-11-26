@@ -46,14 +46,14 @@ define('DB_COLLATE', '');
  *
  * @since 2.6.0
  */
-define('AUTH_KEY',         '81b0a1abdbf3f98d3e6a2e53c18c4267c5c7f399');
-define('SECURE_AUTH_KEY',  '34ca77ab34fb72c3eb0732566a104018bac71bbe');
-define('LOGGED_IN_KEY',    '9eb3e441c50097cd61afc7d2778c4d3326554777');
-define('NONCE_KEY',        '10005f0ffc3f0b31076e3a6af3d2374fb51b662b');
-define('AUTH_SALT',        '733785430d8e402ed31106e0aac3f4f2ed03a392');
-define('SECURE_AUTH_SALT', 'e7663d1e7694d8809cc450ad8ffb2967fef9e936');
-define('LOGGED_IN_SALT',   '47501dd0f482bb3c0ba3db10369726cce806e0a8');
-define('NONCE_SALT',       'cd9745ce0d6732b14c031e15e567de477f3d56b3');
+define('AUTH_KEY',         '83b983e80bb713bf2fb4709a29a22f608ef43cfa');
+define('SECURE_AUTH_KEY',  '500c9b1d00998818220e721db5578122207993ec');
+define('LOGGED_IN_KEY',    '84c8de10ad10b7ad8c1eacc71986ee14c4c46810');
+define('NONCE_KEY',        '6453e2e55a74852806f781c4bb136eb5bdd4e4fc');
+define('AUTH_SALT',        'bd25f29717a3ccc4733426e98261c40a14c5d7db');
+define('SECURE_AUTH_SALT', 'ab42fe72edd182cbe93faa4dd72d7b4b21bd3994');
+define('LOGGED_IN_SALT',   'a289e93d68cf61f1cd8d6512e5ca3064ade891bf');
+define('NONCE_SALT',       '80d4b88be54d3aab56be3c035a3cf6b3a73d8476');
 
 /**#@-*/
 
@@ -87,17 +87,9 @@ if (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROT
 
 /* That's all, stop editing! Happy blogging. */
 
-
-/* enable media uploads */
-define( 'UPLOADS', 'wp-content/uploads' );
-
-
-
 /** Absolute path to the WordPress directory. */
 if ( !defined('ABSPATH') )
 	define('ABSPATH', dirname(__FILE__) . '/');
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
-
-define('FS_METHOD', 'direct');

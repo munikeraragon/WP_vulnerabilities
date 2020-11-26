@@ -3,7 +3,10 @@ version: '3.1'
 services:
 
   wordpress:
-    image: "wordpress:4.9"
+    image: "vuln-wordpress:4.7.0"
+    build:
+      context: ./4.7.0/
+      dockerfile: Dockerfile
     restart: always
     ports:
       - 8080:80
@@ -17,7 +20,10 @@ services:
     depends_on:
       - fix_wordpress_permissions
   fix_wordpress_permissions:
-    image: "wordpress:4.9"
+    image: "vuln-wordpress:4.7.0"
+    build:
+      context: ./4.7.0/
+      dockerfile: Dockerfile
     volumes:
       - wordpress:/var/www/html
     command: chown -R www-data:www-data /var/www/html/

@@ -184,6 +184,15 @@ if ( ! CUSTOM_TAGS ) {
 			'lang' => true,
 			'xml:lang' => true,
 		),
+		'form' => array(
+			'action' => true,
+			'accept' => true,
+			'accept-charset' => true,
+			'enctype' => true,
+			'method' => true,
+			'name' => true,
+			'target' => true,
+		),
 		'h1' => array(
 			'align' => true,
 		),
@@ -536,7 +545,7 @@ function wp_kses( $string, $allowed_html, $allowed_protocols = array() ) {
  * @return string Filtered attribute.
  */
 function wp_kses_one_attr( $string, $element ) {
-	$uris = wp_kses_uri_attributes();
+	$uris = array('xmlns', 'profile', 'href', 'src', 'cite', 'classid', 'codebase', 'data', 'usemap', 'longdesc', 'action');
 	$allowed_html = wp_kses_allowed_html( 'post' );
 	$allowed_protocols = wp_allowed_protocols();
 	$string = wp_kses_no_null( $string, array( 'slash_zero' => 'keep' ) );
@@ -601,15 +610,14 @@ function wp_kses_one_attr( $string, $element ) {
  * Return a list of allowed tags and attributes for a given context.
  *
  * @since 3.5.0
- * @since 5.0.1 `form` removed as allowable HTML tag.
  *
  * @global array $allowedposttags
  * @global array $allowedtags
  * @global array $allowedentitynames
  *
- * @param string|array $context The context for which to retrieve tags.
- *                              Allowed values are post, strip, data, entities, or
- *                              the name of a field filter such as pre_user_description.
+ * @param string $context The context for which to retrieve tags.
+ *                        Allowed values are post, strip, data,entities, or
+ *                        the name of a field filter such as pre_user_description.
  * @return array List of allowed tags and their allowed attributes.
  */
 function wp_kses_allowed_html( $context = '' ) {
@@ -621,8 +629,9 @@ function wp_kses_allowed_html( $context = '' ) {
 		 *
 		 * @since 3.5.0
 		 *
-		 * @param array  $context      Context to judge allowed tags by.
-		 * @param string $context_type Context type (explicit).
+		 * @param string $tags    Allowed tags, attributes, and/or entities.
+		 * @param string $context Context to judge allowed tags by. Allowed values are 'post',
+		 *                        'data', 'strip', 'entities', 'explicit', or the name of a filter.
 		 */
 		return apply_filters( 'wp_kses_allowed_html', $context, 'explicit' );
 	}
@@ -630,27 +639,7 @@ function wp_kses_allowed_html( $context = '' ) {
 	switch ( $context ) {
 		case 'post':
 			/** This filter is documented in wp-includes/kses.php */
-			$tags = apply_filters( 'wp_kses_allowed_html', $allowedposttags, $context );
-
-			// 5.0.1 removed the `<form>` tag, allow it if a filter is allowing it's sub-elements `<input>` or `<select>`.
-			if ( ! CUSTOM_TAGS && ! isset( $tags['form'] ) && ( isset( $tags['input'] ) || isset( $tags['select'] ) ) ) {
-				$tags = $allowedposttags;
-
-				$tags['form'] = array(
-					'action' => true,
-					'accept' => true,
-					'accept-charset' => true,
-					'enctype' => true,
-					'method' => true,
-					'name' => true,
-					'target' => true,
-				);
-
-				/** This filter is documented in wp-includes/kses.php */
-				$tags = apply_filters( 'wp_kses_allowed_html', $tags, $context );
-			}
-
-			return $tags;
+			return apply_filters( 'wp_kses_allowed_html', $allowedposttags, $context );
 
 		case 'user_description':
 		case 'pre_user_description':
@@ -731,56 +720,6 @@ function wp_kses_split( $string, $allowed_html, $allowed_protocols ) {
 	$pass_allowed_html = $allowed_html;
 	$pass_allowed_protocols = $allowed_protocols;
 	return preg_replace_callback( '%(<!--.*?(-->|$))|(<[^>]*(>|$)|>)%', '_wp_kses_split_callback', $string );
-}
-
-/**
- * Helper function listing HTML attributes containing a URL.
- *
- * This function returns a list of all HTML attributes that must contain
- * a URL according to the HTML specification.
- *
- * This list includes URI attributes both allowed and disallowed by KSES.
- *
- * @link https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes
- *
- * @since 5.0.1
- *
- * @return array HTML attributes that must include a URL.
- */
-function wp_kses_uri_attributes() {
-	$uri_attributes = array(
-		'action',
-		'archive',
-		'background',
-		'cite',
-		'classid',
-		'codebase',
-		'data',
-		'formaction',
-		'href',
-		'icon',
-		'longdesc',
-		'manifest',
-		'poster',
-		'profile',
-		'src',
-		'usemap',
-		'xmlns',
-	);
-
-	/**
-	 * Filters the list of attributes that are required to contain a URL.
-	 *
-	 * Use this filter to add any `data-` attributes that are required to be
-	 * validated as a URL.
-	 *
-	 * @since 5.0.1
-	 *
-	 * @param array $uri_attributes HTML attributes requiring validation as a URL.
-	 */
-	$uri_attributes = apply_filters( 'wp_kses_uri_attributes', $uri_attributes );
-
-	return $uri_attributes;
 }
 
 /**
@@ -889,10 +828,8 @@ function wp_kses_attr($element, $attr, $allowed_html, $allowed_protocols) {
 		$xhtml_slash = ' /';
 
 	// Are any attributes allowed at all for this element?
-	$element_low = strtolower( $element );
-	if ( empty( $allowed_html[ $element_low ] ) || true === $allowed_html[ $element_low ] ) {
+	if ( ! isset($allowed_html[strtolower($element)]) || count($allowed_html[strtolower($element)]) == 0 )
 		return "<$element$xhtml_slash>";
-	}
 
 	// Split it
 	$attrarr = wp_kses_hair($attr, $allowed_protocols);
@@ -980,7 +917,7 @@ function wp_kses_hair($attr, $allowed_protocols) {
 	$attrarr = array();
 	$mode = 0;
 	$attrname = '';
-	$uris = wp_kses_uri_attributes();
+	$uris = array('xmlns', 'profile', 'href', 'src', 'cite', 'classid', 'codebase', 'data', 'usemap', 'longdesc', 'action');
 
 	// Loop through the whole attribute list
 
@@ -1384,8 +1321,7 @@ function wp_kses_html_error($string) {
  * @return string Sanitized content
  */
 function wp_kses_bad_protocol_once($string, $allowed_protocols, $count = 1 ) {
-	$string  = preg_replace( '/(&#0*58(?![;0-9])|&#x0*3a(?![;a-f0-9]))/i', '$1;', $string );
-	$string2 = preg_split( '/:|&#0*58;|&#x0*3a;|&colon;/i', $string, 2 );
+	$string2 = preg_split( '/:|&#0*58;|&#x0*3a;/i', $string, 2 );
 	if ( isset($string2[1]) && ! preg_match('%/\?%', $string2[0]) ) {
 		$string = trim( $string2[1] );
 		$protocol = wp_kses_bad_protocol_once2( $string2[0], $allowed_protocols );
@@ -1513,7 +1449,6 @@ function wp_kses_normalize_entities2($matches) {
  * This function helps wp_kses_normalize_entities() to only accept valid Unicode
  * numeric entities in hex form.
  *
- * @since 2.7.0
  * @access private
  *
  * @param array $matches preg_replace_callback() matches array
@@ -1529,8 +1464,6 @@ function wp_kses_normalize_entities3($matches) {
 
 /**
  * Helper function to determine if a Unicode value is valid.
- *
- * @since 2.7.0
  *
  * @param int $i Unicode value
  * @return bool True if the value was a valid Unicode number
@@ -1564,8 +1497,6 @@ function wp_kses_decode_entities($string) {
 /**
  * Regex callback for wp_kses_decode_entities()
  *
- * @since 2.9.0
- *
  * @param array $match preg match
  * @return string
  */
@@ -1575,8 +1506,6 @@ function _wp_kses_decode_entities_chr( $match ) {
 
 /**
  * Regex callback for wp_kses_decode_entities()
- *
- * @since 2.9.0
  *
  * @param array $match preg match
  * @return string
